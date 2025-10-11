@@ -26,8 +26,8 @@ static void exit_fail(const char *msg)
 
 static int compress_file(FL2_CStream *fcs)
 {
-    unsigned char in_buffer[8 * 1024];
-    unsigned char out_buffer[4 * 1024];
+    unsigned char in_buffer[128 * 1024];
+    unsigned char out_buffer[64 * 1024];
     FL2_inBuffer in_buf = { in_buffer, sizeof(in_buffer), sizeof(in_buffer) };
     FL2_outBuffer out_buf = { out_buffer, sizeof(out_buffer), 0 };
     size_t res = 0;
@@ -58,7 +58,7 @@ static int compress_file(FL2_CStream *fcs)
         out_buf.pos = 0;
     } while (res);
     fprintf(stdout, "\t%ld -> %ld\n", in_size, out_size);
-    
+
     return 0;
 
 error_out:
@@ -68,8 +68,8 @@ error_out:
 
 static int decompress_file(FL2_DStream *fds)
 {
-    unsigned char in_buffer[4 * 1024];
-    unsigned char out_buffer[8 * 1024];
+    unsigned char in_buffer[64 * 1024];
+    unsigned char out_buffer[128 * 1024];
     FL2_inBuffer in_buf = { in_buffer, sizeof(in_buffer), sizeof(in_buffer) };
     FL2_outBuffer out_buf = { out_buffer, sizeof(out_buffer), 0 };
     size_t res;
@@ -88,9 +88,9 @@ static int decompress_file(FL2_DStream *fds)
         out_size += out_buf.pos;
         out_buf.pos = 0;
     } while (res && in_buf.size);
-    
+
     fprintf(stdout, "\t%ld -> %ld\n", in_size, out_size);
-    
+
     return 0;
 
 error_out:
@@ -114,11 +114,11 @@ static void open_files(const char *name)
 
 static void create_init_fl2_streams(int preset)
 {
-    fcs = FL2_createCStreamMt(2, 0);
+    fcs = FL2_createCStreamMt(1, 0);
     if (fcs == NULL)
         exit_fail("Cannot allocate compression context.\n");
 
-    fds = FL2_createDStreamMt(2);
+    fds = FL2_createDStreamMt(1);
     if (fds == NULL)
         exit_fail("Cannot allocate decompression context.\n");
 
@@ -156,7 +156,7 @@ int main(int argc, char **argv)
     create_init_fl2_streams(preset);
     open_files(name);
     fprintf(stdout, "Compress %s to %s:\n", name, out_name);
-    
+
     if (compress_file(fcs))
         goto cleanup;
 
