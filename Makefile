@@ -3,6 +3,9 @@ OBJ = $(SRC:.c=.o)
 DEP = $(OBJ:.o=.d)
 
 CFLAGS:=-Wall -O2 -pthread -fPIC
+CFLAGS+=-g3 -fsanitize=address -fsanitize=undefined
+LDFLAGS+=-g3 -fsanitize=address -fsanitize=undefined
+LDLIBS+=-g3 -fsanitize=address -fsanitize=undefined
 CC:=gcc
 AR:=ar -rcs
 RM:=rm -rf
